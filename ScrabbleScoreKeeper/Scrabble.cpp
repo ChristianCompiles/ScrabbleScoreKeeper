@@ -1,15 +1,20 @@
 #include "Player.cpp"
-#include <vector>;
+#include <vector>
 #include <iostream>
+#include <fstream>
+#include <stdlib.h>
+#include <algorithm>
 using namespace std;
 
 const int CHAR_SIZE = 21;
+const int MAX_PLAYERS = 4;
 
 class Scrabble
 {
 private:
-	Player* playersArray;
+	vector<Player> playerList;
 	char date[CHAR_SIZE];
+	fstream gamestream;
 
 public:
 
@@ -23,28 +28,30 @@ public:
 		cout << "Number of players: ";
 		cin >> numPlayers;
 
-		playersArray = new Player[numPlayers];
+		cout << "Enter Date (xx-xx-xxxx): ";
+		cin >> date;
+		cout << endl;
 
 		for (int i = 0; i < numPlayers; i++)
 		{
-			cout << "Enter player " << i << "name: ";
+			cout << "Enter player " << i + 1 << " name: ";
 			cin >> name;
 			p.setName(name);
-			playersArray[i] = p;
+			playerList.push_back(p);
 		}
 
-		cout << "Enter -1 for any score when the game ends\n";
+		cout << "\nEnter -1 for any score when the game ends\n";
 
 		int score = 0;
 		int index = 0;
 
 		while (score != -1)
 		{
-			cout << "How many points did " << playersArray[index].getName() << "score? ";
+			cout << "How many points did " << playerList[index].getName() << " score? ";
 			cin >> score;
-			playersArray[index].addScore(score);
+			playerList[index].addScore(score);
 
-			if (index < 2)
+			if (index < (numPlayers-1))
 			{
 				index++;
 			}
@@ -52,12 +59,54 @@ public:
 			{
 				index = 0;
 			}
-
-
-
-
 		}
+
+		system("CLS");
 	}
+
+	// Comparison function for sorting Player instances based on their score value
+	bool compareMyObjects(Player &obj1, Player &obj2) 
+	{
+		return obj1.getPlayerScore() < obj2.getPlayerScore();
+	}
+
+	void displayWinners()
+	{
+		std::sort(playerList.begin(), playerList.end(), compareMyObjects);
+	}
+
+
+	//
+
+	void displayWinners()
+	{
+		std::sort(playerList.begin(), playerList.end(), [](const Player& player1, const Player& player2) {
+			return player1.getPlayerScore() < player2.getPlayerScore();
+			});
+
+	}
+
+
+
+	void addGameToFile()
+	{
+		gamestream.open("games.dat", ios::out | ios::app | ios::binary);
+		if (!gamestream)
+		{
+			cout << "Error Opening File.\n";
+			cin.ignore();
+			cin.get();
+			exit(1);
+		}
+		else
+		{
+			gamestream.write(reinterpret_cast<char*>(&playerList), sizeof(playerList.size()));
+			gamestream.write(reinterpret_cast<char*>(&date), sizeof(date[CHAR_SIZE]));
+		} 
+		gamestream.close();
+		cout << endl;
+	}
+
 
 	void menu()
 	{
