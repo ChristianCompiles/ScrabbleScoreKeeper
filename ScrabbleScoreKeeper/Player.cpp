@@ -9,7 +9,7 @@ private:
 	string name;
 	int score_list[MAX_SCORES] = { -1 };
 	int scoreIndex = 0;
-	int player_total;
+	int player_total = 0;
 
 public:
 
