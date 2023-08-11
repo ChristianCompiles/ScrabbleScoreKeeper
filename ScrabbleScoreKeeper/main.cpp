@@ -7,7 +7,7 @@ int main()
 {
 	Game game;
 
-	game.playGame();
+	game.menu();
 
 	return 0;
 }
